@@ -1,0 +1,73 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    /*min-width: 100vw;*/
+    background-color: #222;
+    color: #eee;
+    font-family: "Ephesis", sans-serif;
+    font-weight: 100;
+}
+
+.hub {
+    width: 250px;
+    height: 250px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    box-shadow: 
+        1px 0 2rem 1px rgba(0, 0, 0, .2)
+        /* ,inset 0 0 2rem 1px rgba(0, 0, 0, .2) */
+    ;
+}
+
+.hub::after,
+.hub::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    stroke-linecap: round;
+}
+
+.hub::before {
+    width: calc(100% + 12px);
+    height: calc(100% + 12px);
+    border-top-color: #94ff62;
+    animation: circuit 1s linear infinite; /* ease-in-out */
+}
+
+.hub::after {
+    width: calc(100% + 30px);
+    height: calc(100% + 30px);
+    border-top-color: #6299ff;
+    animation: circuit 5s linear infinite; /* ease-in-out */
+    animation-direction: reverse;
+}
+
+.title {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+@keyframes circuit {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
