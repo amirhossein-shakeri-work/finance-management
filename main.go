@@ -26,10 +26,10 @@ func setupRoutes(app *fiber.App) {
 	v1.Patch("/accounts/:id", account.Update)
 	v1.Delete("/accounts/:id", account.Delete)
 	/* =-=-=-=-=-=-= Session & User =-=-=-=-=-=-= */
-	v1.Get("/session")    // get loged in user
-	v1.Post("/session")   // login
-	v1.Delete("/session") // logout / smiliar to /logout
-	v1.Post("/users")
+	// v1.Get("/session")    // get loged in user
+	// v1.Post("/session")   // login
+	// v1.Delete("/session") // logout / smiliar to /logout
+	// v1.Post("/users")
 	/* =-=-=-=-=-=-= Transactions =-=-=-=-=-=-= */
 }
 

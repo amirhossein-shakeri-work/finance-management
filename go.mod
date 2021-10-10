@@ -8,7 +8,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/gofiber/fiber/v2 v2.19.0 // indirect
+	github.com/gofiber/fiber/v2 v2.20.1 // indirect
+	github.com/gofiber/jwt/v3 v3.1.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/kamva/mgm/v3 v3.3.1 // indirect

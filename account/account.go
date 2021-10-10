@@ -19,13 +19,8 @@ func NewAccount(name string, balance float64) *Account {
 	}
 }
 
-// var accounts = []Account{
-// 	{Name: "Investing Account", Balance: 1000000000.24},
-// 	{Name: "Temp Account", Balance: 1000000.56},
-// }
-
 func Index(c *fiber.Ctx) error {
-	accounts := []Account{}
+	var accounts []Account
 	err := mgm.Coll(&Account{}).SimpleFind(&accounts, bson.M{})
 	if err != nil { return err }
 	return c.JSON(accounts)
