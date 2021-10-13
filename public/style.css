@@ -46,14 +46,17 @@ body {
     width: calc(100% + 12px);
     height: calc(100% + 12px);
     border-top-color: #94ff62;
-    animation: circuit 1s linear infinite; /* ease-in-out */
+    animation: circuit 2s linear infinite; /* ease-in-out */
+    /* animation: circuit10 5s cubic-bezier(0.65, 0.25, 0.25, 0.65) infinite; ease-in-out */
 }
 
 .hub::after {
     width: calc(100% + 30px);
     height: calc(100% + 30px);
     border-top-color: #6299ff;
-    animation: circuit 5s linear infinite; /* ease-in-out */
+    animation: circuit 8s linear infinite; /* ease-in-out */
+    /* animation: circuit 5s cubic-bezier(0.65, 0.25, 0.25, 0.65) infinite; ease-in-out */
+    /* animation-delay: .1s; */
     animation-direction: reverse;
 }
 
@@ -69,5 +72,15 @@ body {
 
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes circuit10 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(7200deg);
     }
 }
