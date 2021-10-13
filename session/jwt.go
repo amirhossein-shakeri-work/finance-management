@@ -24,11 +24,11 @@ var Auth = jwtware.New(jwtware.Config{
 	SigningKey: []byte(SECRET),
 })
 
-func signup(c *fiber.Ctx) error {
+func Signup(c *fiber.Ctx) error {
 	return nil
 }
 
-func login(c *fiber.Ctx) error {
+func Login(c *fiber.Ctx) error {
 	usr := user.User{}
 	var req LoginRequest
 	err := c.BodyParser(req)
@@ -65,7 +65,7 @@ func login(c *fiber.Ctx) error {
 	})
 }
 
-func logout(c *fiber.Ctx) error {
+func Logout(c *fiber.Ctx) error {
 	return nil
 }
 
