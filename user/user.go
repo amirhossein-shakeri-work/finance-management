@@ -1,11 +1,8 @@
 package user
 
 import (
-	"crypto/sha512"
-	"encoding/hex"
-
-	"github.com/gofiber/fiber/v2"
 	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/auth/hash"
 )
 
 type User struct {
@@ -15,7 +12,7 @@ type User struct {
 	Password         string `json:"password"`
 }
 
-func NewUser(name string, email string, password string) *User {
+func New (name, email, password string) *User {
 	return &User{
 		Name:     name,
 		Email:    email,
@@ -23,42 +20,22 @@ func NewUser(name string, email string, password string) *User {
 	}
 }
 
-func CreateNewUser(c *fiber.Ctx) error {
-	usr := new(User)
-	err := c.BodyParser(usr)
-	if err != nil {
-		return fiber.ErrBadRequest
-	}
+func Create (name, email, password string) (*User, error) { // is it ok to return pointer?
+	usr := New(name, email, password)
 
-	/* Generate hash */
-	h := sha512.Sum384([]byte(usr.Password))
-	usr.Password = hex.EncodeToString(h[:])
-	// h := sha512.New384()
-	// h.Write([]byte(usr.Password))
-	// usr.Password = string(h.Sum(nil))
-	// usr.Password = string(sha512.Sum384([]byte(usr.Password))) // doesn't work?
+	/* hash password */
+	usr.Password = hash.GenerateHash(usr.Password)
 
-	/* Save to db */
-	err = mgm.Coll(usr).Create(usr)
-	if err != nil {
-		return err
-	}
-
-	// log the user in ...
-	return c.Status(fiber.StatusCreated).JSON(usr)
+	/* save to db */
+	err := mgm.Coll(usr).Create(usr)
+	return usr, err
 }
 
-func DeleteUser(c *fiber.Ctx) error {
-	usr := &User{}
-	err := mgm.Coll(usr).FindByID(c.Params("id"), usr)
-	if err != nil {
-		return fiber.ErrNotFound
-	}
-	err = mgm.Coll(usr).Delete(usr)
-	if err != nil {
-		return fiber.ErrInternalServerError
-	}
-	return c.SendStatus(fiber.StatusNoContent)
+func (user *User) Update (attr map[string]interface{}) (*User, error) {
+	// for key, value := range attr {
+	// 	user
+	// }
+	return user, nil
 }
 
 // func deleteAccount(c *fiber.Ctx) error {

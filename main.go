@@ -9,8 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/account"
-	"github.com/sizata-siege/finance-management/session"
-	"github.com/sizata-siege/finance-management/user"
+	"github.com/sizata-siege/finance-management/auth"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -28,10 +27,10 @@ func setupRoutes(app *fiber.App) {
 	v1.Patch("/accounts/:id", account.Update)
 	v1.Delete("/accounts/:id", account.Delete)
 	/* =-=-=-=-=-=-= Session & User =-=-=-=-=-=-= */
-	// v1.Get("/session")    // get loged in user
-	v1.Post("/session", session.Login)   // login
-	v1.Delete("/session", session.Logout) // logout / smiliar to /logout
-	v1.Post("/users", user.CreateNewUser)
+	// v1.Get("/auth")    // get loged in user
+	v1.Post("/session", auth.Login)    // login
+	v1.Delete("/session", auth.Logout) // logout / smiliar to /logout
+	v1.Post("/users", auth.CreateNewUser)
 	/* =-=-=-=-=-=-= Transactions =-=-=-=-=-=-= */
 }
 
