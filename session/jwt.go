@@ -31,7 +31,7 @@ func Signup(c *fiber.Ctx) error {
 func Login(c *fiber.Ctx) error {
 	usr := user.User{}
 	var req LoginRequest
-	err := c.BodyParser(req)
+	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err, // todo: ok?
