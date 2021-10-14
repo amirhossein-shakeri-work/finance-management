@@ -2,6 +2,7 @@ package user
 
 import (
 	"crypto/sha512"
+	"encoding/hex"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamva/mgm/v3"
@@ -30,9 +31,11 @@ func CreateNewUser(c *fiber.Ctx) error {
 	}
 
 	/* Generate hash */
-	h := sha512.New384()
-	h.Write([]byte(usr.Password))
-	usr.Password = string(h.Sum(nil))
+	h := sha512.Sum384([]byte(usr.Password))
+	usr.Password = hex.EncodeToString(h[:])
+	// h := sha512.New384()
+	// h.Write([]byte(usr.Password))
+	// usr.Password = string(h.Sum(nil))
 	// usr.Password = string(sha512.Sum384([]byte(usr.Password))) // doesn't work?
 
 	/* Save to db */
