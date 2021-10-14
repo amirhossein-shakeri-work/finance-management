@@ -8,9 +8,11 @@ import (
 
 const (
 	SECRET = "Fuck USA"
+	CookieName = "jwt_token"
 )
 
-func DefaultSessionExp () int64 { return time.Now().Add(time.Hour * 24 * 30).Unix() }
+func DefaultSessionExpUnix () int64 { return time.Now().Add(time.Hour * 24 * 30).Unix() }
+func DefaultSessionExp () time.Time { return time.Now().Add(time.Hour * 24 * 30) }
 
 func GenerateToken(clms map[string]interface{}) (string, error) {
 	/* Create token */

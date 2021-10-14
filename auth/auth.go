@@ -19,9 +19,10 @@ type LoginRequest struct {
 
 /* Auth middleware */
 
-var Auth = jwtware.New(jwtware.Config{
-	// ErrorHandler: authErrorHandler,
+var Middleware = jwtware.New(jwtware.Config{
+	ErrorHandler: authErrorHandler,
 	SigningKey: []byte(jwt.SECRET),
+	TokenLookup: "cookie:" + jwt.CookieName,
 })
 
 /* handlers & controllers */
@@ -50,7 +51,7 @@ func Login(c *fiber.Ctx) error {
 
 	t, err := jwt.GenerateToken(map[string]interface{}{
 		"id":  usr.ID,
-		"exp": jwt.DefaultSessionExp(),
+		"exp": jwt.DefaultSessionExpUnix(),
 		// "name": usr.Name,
 		// "admin": false,
 	})
@@ -58,6 +59,11 @@ func Login(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
+	c.Cookie(&fiber.Cookie{
+		Name: jwt.CookieName,
+		Value: t,
+		Expires: jwt.DefaultSessionExp(),
+	})
 	return c.JSON(fiber.Map{
 		"token": t,
 		"user": usr,
@@ -87,7 +93,7 @@ func CreateNewUser(c *fiber.Ctx) error {
 	// usr.Password = ""
 	t, err := jwt.GenerateToken(map[string]interface{}{
 		"id":  usr.ID,
-		"exp": jwt.DefaultSessionExp(),
+		"exp": jwt.DefaultSessionExpUnix(),
 	})
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"id": usr.ID,

@@ -8,31 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/kamva/mgm/v3"
-	"github.com/sizata-siege/finance-management/account"
-	"github.com/sizata-siege/finance-management/auth"
+	"github.com/sizata-siege/finance-management/routes"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-func setupRoutes(app *fiber.App) {
-	// app.Get("/", indexHome)
-	app.Static("/", "./public", fiber.Static{MaxAge: -1})
-
-	api := app.Group("/api", callNext)
-
-	v1 := api.Group("/v1", callNext)
-	/* =-=-=-=-=-=-= Accounts =-=-=-=-=-=-= */
-	v1.Get("/accounts", account.Index)
-	v1.Post("/accounts", account.Store)
-	v1.Get("/accounts/:id", account.Show)
-	v1.Patch("/accounts/:id", account.Update)
-	v1.Delete("/accounts/:id", account.Delete)
-	/* =-=-=-=-=-=-= Session & User =-=-=-=-=-=-= */
-	// v1.Get("/auth")    // get loged in user
-	v1.Post("/session", auth.Login)    // login
-	v1.Delete("/session", auth.Logout) // logout / smiliar to /logout
-	v1.Post("/users", auth.CreateNewUser)
-	/* =-=-=-=-=-=-= Transactions =-=-=-=-=-=-= */
-}
 
 func init() {
 	// https://github.com/Kamva/mgm
@@ -41,7 +19,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Connected to db ...")
+	log.Println("Connected to db ✔️")
 }
 
 func main() {
@@ -54,7 +32,7 @@ func main() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 
-	setupRoutes(app)
+	routes.SetupAPI(app)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -63,9 +41,3 @@ func main() {
 	log.Println("Listening on port", port)
 	log.Fatal(app.Listen(":" + port))
 }
-
-func indexHome(c *fiber.Ctx) error {
-	return c.SendString("Welcome to SIZATA's Finance Management System")
-}
-
-func callNext(c *fiber.Ctx) error { return c.Next() }
