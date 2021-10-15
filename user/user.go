@@ -3,16 +3,24 @@ package user
 import (
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/auth/hash"
+	"go.mongodb.org/mongo-driver/tag"
 )
 
 type User struct {
 	mgm.DefaultModel `bson:",inline"`
-	Name             string `json:"name"`
-	Email            string `json:"email"`
-	Password         string `json:"password"`
+	Name             string  `json:"name"`
+	Email            string  `json:"email"`
+	Password         string  `json:"password"`
+	Tags             tag.Set `json:"tags" bson:"tags"`
 }
 
-func New (name, email, password string) *User {
+type Attr struct {
+	name     string
+	email    string
+	password string
+}
+
+func New(name, email, password string) *User {
 	return &User{
 		Name:     name,
 		Email:    email,
@@ -20,24 +28,26 @@ func New (name, email, password string) *User {
 	}
 }
 
-func Create (name, email, password string) (*User, error) { // is it ok to return pointer?
-	usr := New(name, email, password)
+func Create(a Attr) (*User, error) { // is it ok to return pointer?
+	usr := New(a.name, a.email, a.password)
 
 	/* hash password */
 	usr.Password = hash.GenerateHash(usr.Password)
 
 	/* save to db */
-	err := mgm.Coll(usr).Create(usr)
-	return usr, err
+	return usr, mgm.Coll(usr).Create(usr)
 }
 
-func (user *User) Update (attr map[string]interface{}) (*User, error) {
-	// for key, value := range attr {
-	// 	user
-	// }
-	return user, nil
-}
-
-// func deleteAccount(c *fiber.Ctx) error {
-// 	return nil
+// func (user *User) Update(a map[string]interface{}) (*User, error) { // map[string]interface{}
+// 	// for key, value := range a {
+// 	// 	switch key {
+// 	// 	case "name": user.Name = string(value)
+// 	// 	}
+// 	// }
+// 	// mgm.Coll(user).Update()
+// 	return user, nil
 // }
+
+func (user *User) Delete() (*User, error) {
+	return user, mgm.Coll(user).Delete(user)
+}
