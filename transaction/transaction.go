@@ -10,6 +10,7 @@ type Transaction struct {
 	mgm.DefaultModel `bson:",inline"`
 	Type             string             `json:"type" bson:"type"`
 	Amount           float64            `json:"amount" bson:"amount"`
+	Description      string             `json:"description" bson:"description"`
 	AccountID        primitive.ObjectID `json:"account_id" bson:"account_id"`
 	Tags             tag.Set            `json:"tags" bson:"tags"`
 }
@@ -33,6 +34,6 @@ func Create(a Attr) (*Transaction, error) {
 	return tr, mgm.Coll(tr).Create(tr)
 }
 
-func (tr *Transaction) Delete () (*Transaction, error) {
+func (tr *Transaction) Delete() (*Transaction, error) {
 	return tr, mgm.Coll(tr).Delete(tr)
 }
