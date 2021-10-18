@@ -27,3 +27,7 @@ func GenerateToken(clms map[string]interface{}) (string, error) {
 	/* Generate encoded token and send it as response */
 	return token.SignedString([]byte(SECRET))
 }
+
+func (c *fiber.Ctx) user () user.User {
+	//
+}
