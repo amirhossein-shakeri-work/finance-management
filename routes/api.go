@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth"
@@ -57,6 +55,6 @@ func testHandler (c *fiber.Ctx) error {
 	// 	Expires: time.Now().Add(time.Minute * 10),
 	// })
 
-	log.Printf("%v", usr.Claims)
+	// log.Printf("%v", usr.Claims)
 	return c.SendString("OK")
 }

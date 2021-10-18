@@ -3,7 +3,10 @@ package jwt
 import (
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/user"
 )
 
 const (
@@ -11,16 +14,24 @@ const (
 	CookieName = "jwt_token"
 )
 
+/* jwtCustomClaims are custom claims extending default ones. */
+// See https://github.com/golang-jwt/jwt for more examples
+type CustomClaims struct {
+	ID string `json:"id"`
+	jwt.StandardClaims
+}
+
+
 func DefaultSessionExpUnix () int64 { return time.Now().Add(time.Hour * 24 * 30).Unix() }
 func DefaultSessionExp () time.Time { return time.Now().Add(time.Hour * 24 * 30) }
 
-func GenerateToken(clms map[string]interface{}) (string, error) {
+func GenerateToken(mapClaims map[string]interface{}) (string, error) {
 	/* Create token */
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	/* Set claims */
 	claims := token.Claims.(jwt.MapClaims)
-	for key, value := range clms {
+	for key, value := range mapClaims {
 		claims[key] = value
 	}
 
@@ -28,6 +39,14 @@ func GenerateToken(clms map[string]interface{}) (string, error) {
 	return token.SignedString([]byte(SECRET))
 }
 
-func (c *fiber.Ctx) user () user.User {
-	//
+func (c *fiber.Ctx) user () *user.User {
+	/* Parse user */
+	usr := c.Locals("user").(*jwt.Token)
+	claims := usr.Claims.(*CustomClaims)
+	id := claims.ID
+	user := &user.User{}
+	if err := mgm.Coll(user).FindByID(id, user); err != nil {
+		return nil
+	}
+	return user
 }

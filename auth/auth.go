@@ -1,11 +1,8 @@
 package auth
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
-	gojwt "github.com/golang-jwt/jwt/v4"
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/auth/hash"
 	"github.com/sizata-siege/finance-management/auth/jwt"
@@ -22,20 +19,21 @@ type LoginRequest struct {
 
 /* Auth middleware */
 
-var BasicMiddleware = jwtware.New(jwtware.Config{
+var Middleware = jwtware.New(jwtware.Config{
 	ErrorHandler: authErrorHandler,
-	SigningKey: []byte(jwt.SECRET),
-	TokenLookup: "cookie:" + jwt.CookieName,
+	SigningKey:   []byte(jwt.SECRET),
+	TokenLookup:  "cookie:" + jwt.CookieName,
 })
 
-func Middleware (c *fiber.Ctx) error {
+func TmpMiddleware(c *fiber.Ctx) error {
 	/* Call basic middleware first */
-	if err := BasicMiddleware(c); err != nil {
+	if err := Middleware(c); err != nil {
 		return err
 	} // maybe make a fun to parse user ... usr:=auth.user(c) ...
 
+	return nil
 	/* parse user claims */
-	usr := c.Locals("user").(*gojwt.Token)
+	// usr := c.Locals("user").(*gojwt.Token)
 }
 
 /* handlers & controllers */
@@ -73,14 +71,14 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name: jwt.CookieName,
-		Value: t,
+		Name:    jwt.CookieName,
+		Value:   t,
 		Expires: jwt.DefaultSessionExp(),
 	})
 	return c.JSON(fiber.Map{
 		"token": t,
-		"id": usr.ID,
-		"name": usr.Name,
+		"id":    usr.ID,
+		"name":  usr.Name,
 		"email": usr.Email,
 	})
 }
@@ -111,8 +109,8 @@ func CreateNewUser(c *fiber.Ctx) error {
 		"exp": jwt.DefaultSessionExpUnix(),
 	})
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"id": usr.ID,
-		"name": usr.Name,
+		"id":    usr.ID,
+		"name":  usr.Name,
 		"email": usr.Email,
 		"token": t,
 	})
@@ -137,7 +135,7 @@ func Logout(c *fiber.Ctx) error {
 
 func authErrorHandler(c *fiber.Ctx, err error) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		"error": err,
+		"error":   err,
 		"message": "Unauthorized",
 	})
 }
