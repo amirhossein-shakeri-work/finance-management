@@ -1,8 +1,11 @@
 package auth
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
+	gojwt "github.com/golang-jwt/jwt/v4"
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/auth/hash"
 	"github.com/sizata-siege/finance-management/auth/jwt"
@@ -19,11 +22,21 @@ type LoginRequest struct {
 
 /* Auth middleware */
 
-var Middleware = jwtware.New(jwtware.Config{
+var BasicMiddleware = jwtware.New(jwtware.Config{
 	ErrorHandler: authErrorHandler,
 	SigningKey: []byte(jwt.SECRET),
 	TokenLookup: "cookie:" + jwt.CookieName,
 })
+
+func Middleware (c *fiber.Ctx) error {
+	/* Call basic middleware first */
+	if err := BasicMiddleware(c); err != nil {
+		return err
+	} // maybe make a fun to parse user ... usr:=auth.user(c) ...
+
+	/* parse user claims */
+	usr := c.Locals("user").(*gojwt.Token)
+}
 
 /* handlers & controllers */
 

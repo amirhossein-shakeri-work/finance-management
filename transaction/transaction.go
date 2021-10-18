@@ -8,29 +8,32 @@ import (
 
 type Transaction struct {
 	mgm.DefaultModel `bson:",inline"`
-	Type             string             `json:"type" bson:"type"`
+	Source           primitive.ObjectID `json:"source" bson:"source"` // or string
 	Amount           float64            `json:"amount" bson:"amount"`
+	Destination      primitive.ObjectID `json:"destination" bson:"destination"` // or string
 	Description      string             `json:"description" bson:"description"`
-	AccountID        primitive.ObjectID `json:"account_id" bson:"account_id"`
 	Tags             tag.Set            `json:"tags" bson:"tags"`
+	// Type             string             `json:"type" bson:"type"` // no idea
 }
 
 type Attr struct {
-	t      string
-	amount float64
-	accId  primitive.ObjectID
+	source      primitive.ObjectID
+	amount      float64
+	destination primitive.ObjectID
+	description string
 }
 
-func New(t string, amount float64, accId primitive.ObjectID) *Transaction {
+func New(source primitive.ObjectID, amount float64, destination primitive.ObjectID, desc string) *Transaction {
 	return &Transaction{
-		Type:      t,
-		Amount:    amount,
-		AccountID: accId,
+		Source:      source,
+		Amount:      amount,
+		Destination: destination,
+		Description: desc,
 	}
 }
 
 func Create(a Attr) (*Transaction, error) {
-	tr := New(a.t, a.amount, a.accId)
+	tr := New(a.source, a.amount, a.destination, a.description)
 	return tr, mgm.Coll(tr).Create(tr)
 }
 

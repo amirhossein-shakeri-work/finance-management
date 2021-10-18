@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"time"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sizata-siege/finance-management/account"
@@ -35,7 +35,7 @@ func SetupAPI(app *fiber.App) {
 	// transactions.Get("/", )
 
 	/* =-=-=-=-=-=-= Test =-=-=-=-=-=-= */
-	app.Get("/test", testHandler)
+	app.Get("/test", auth.Middleware, testHandler)
 }
 
 const welcomeMessage = "Welcome to SIZATA's Finance Management System"
@@ -51,10 +51,12 @@ func indexHome(c *fiber.Ctx) error {
 func callNext(c *fiber.Ctx) error { return c.Next() }
 
 func testHandler (c *fiber.Ctx) error {
-	c.Cookie(&fiber.Cookie{
-		Name: "Foo",
-		Value: "Bar",
-		Expires: time.Now().Add(time.Minute * 10),
-	})
+	// c.Cookie(&fiber.Cookie{
+	// 	Name: "Foo",
+	// 	Value: "Bar",
+	// 	Expires: time.Now().Add(time.Minute * 10),
+	// })
+
+	log.Printf("%v", usr.Claims)
 	return c.SendString("OK")
 }
