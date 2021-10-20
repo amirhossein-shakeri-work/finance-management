@@ -1,7 +1,10 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth"
 )
@@ -48,7 +51,7 @@ func indexHome(c *fiber.Ctx) error {
 
 func callNext(c *fiber.Ctx) error { return c.Next() }
 
-func testHandler (c *fiber.Ctx) error {
+func testHandler(c *fiber.Ctx) error {
 	// c.Cookie(&fiber.Cookie{
 	// 	Name: "Foo",
 	// 	Value: "Bar",
@@ -56,5 +59,9 @@ func testHandler (c *fiber.Ctx) error {
 	// })
 
 	// log.Printf("%v", usr.Claims)
+	// j := jwt.New(c)
+	j := c.Locals("user").(*jwt.Token)
+	claims := j.Claims.(jwt.MapClaims)
+	fmt.Printf("%v %v !!! %T %T\n", claims["id"], claims["exp"], claims["exp"], claims["id"])
 	return c.SendString("OK")
 }
