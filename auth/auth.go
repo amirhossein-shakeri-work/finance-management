@@ -91,6 +91,9 @@ func CreateNewUser(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
+	/* Check email availability */
+	//
+
 	/* Generate hash */
 	usr.Password = hash.GenerateHash(usr.Password)
 

@@ -4,6 +4,7 @@ import (
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/hash"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/tag"
 )
 
@@ -83,4 +84,17 @@ func (user *User) Saving() error {
 		}
 	}
 	return nil
+}
+
+/* =-=-=-=-=-=-= DB Helpers =-=-=-=-=-=-= */
+func Find(id string) *User {
+	u := &User{}
+	mgm.Coll(u).FindByID(id, u)
+	return u
+}
+
+func FindByEmail(email string) *User {
+	u := &User{}
+	mgm.Coll(u).First(bson.M{"email": email}, u) // get all of them?
+	return u
 }
