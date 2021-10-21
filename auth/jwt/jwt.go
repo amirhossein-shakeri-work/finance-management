@@ -41,8 +41,9 @@ func GenerateToken(mapClaims map[string]interface{}) (string, error) {
 
 type JWT struct {
 	Ctx *fiber.Ctx
-	Claims *CustomClaims
+	Claims jwt.MapClaims
 	User *user.User
+	// Claims *CustomClaims
 	// ID string
 	// user (*JWT) *user.User
 }
@@ -54,15 +55,17 @@ func New (c *fiber.Ctx) *JWT {
 	return j
 }
 
-func (j *JWT) parseClaims () *CustomClaims {
-	usr := j.Ctx.Locals("user").(*jwt.Token)
-	return usr.Claims.(*CustomClaims)
+func (j *JWT) parseClaims () jwt.MapClaims {
+	u := j.Ctx.Locals("user").(*jwt.Token)
+	return u.Claims.(jwt.MapClaims)
+	// usr := j.Ctx.Locals("user").(*jwt.Token)
+	// return usr.Claims.(*CustomClaims)
 }
 
 func (j *JWT) user () *user.User {
 	/* Parse user */
 	u := &user.User{}
-	if err := mgm.Coll(u).FindByID(j.parseClaims().ID, u); err != nil {
+	if err := mgm.Coll(u).FindByID(j.parseClaims()["id"], u); err != nil {
 		return nil
 	}
 	return u

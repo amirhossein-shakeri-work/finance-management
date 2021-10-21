@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth"
+	"github.com/sizata-siege/finance-management/auth/jwt"
 )
 
 func SetupAPI(app *fiber.App) {
@@ -59,9 +59,10 @@ func testHandler(c *fiber.Ctx) error {
 	// })
 
 	// log.Printf("%v", usr.Claims)
-	// j := jwt.New(c)
-	j := c.Locals("user").(*jwt.Token)
-	claims := j.Claims.(jwt.MapClaims)
-	fmt.Printf("%v %v !!! %T %T\n", claims["id"], claims["exp"], claims["exp"], claims["id"])
+	// j := c.Locals("user").(*jwt.Token)
+	// claims := j.Claims.(jwt.MapClaims)
+	// fmt.Printf("%v %v !!! %T %T\n", claims["id"], claims["exp"], claims["exp"], claims["id"])
+	j := jwt.New(c)
+	fmt.Println(j.User, j.Claims, j.User.ID)
 	return c.SendString("OK")
 }
