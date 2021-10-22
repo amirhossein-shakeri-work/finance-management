@@ -92,7 +92,9 @@ func CreateNewUser(c *fiber.Ctx) error {
 	}
 
 	/* Check email availability */
-	//
+	if u := user.FindByEmail(usr.Email); u != nil {
+		return c.Status(422).JSON(fiber.Map{"message": "Email taken"})
+	}
 
 	/* Generate hash */
 	usr.Password = hash.GenerateHash(usr.Password)

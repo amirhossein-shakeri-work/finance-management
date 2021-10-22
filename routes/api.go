@@ -1,12 +1,9 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth"
-	"github.com/sizata-siege/finance-management/auth/jwt"
 )
 
 func SetupAPI(app *fiber.App) {
@@ -62,7 +59,10 @@ func testHandler(c *fiber.Ctx) error {
 	// j := c.Locals("user").(*jwt.Token)
 	// claims := j.Claims.(jwt.MapClaims)
 	// fmt.Printf("%v %v !!! %T %T\n", claims["id"], claims["exp"], claims["exp"], claims["id"])
-	j := jwt.New(c)
-	fmt.Println(j.User, j.Claims, j.User.ID)
+	// j := jwt.New(c)
+	// fmt.Println(j.User, j.Claims, j.User.ID)
+	// u := &user.User{}
+	// er := mgm.Coll(u).First(bson.M{"email":"maiddl@example.com"}, u)
+	// fmt.Println(*u, u == nil, u.Email == "", er)
 	return c.SendString("OK")
 }

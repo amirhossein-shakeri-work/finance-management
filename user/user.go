@@ -87,14 +87,19 @@ func (user *User) Saving() error {
 }
 
 /* =-=-=-=-=-=-= DB Helpers =-=-=-=-=-=-= */
+
 func Find(id string) *User {
 	u := &User{}
-	mgm.Coll(u).FindByID(id, u)
+	if err := mgm.Coll(u).FindByID(id, u); err != nil {
+		return nil
+	}
 	return u
 }
 
 func FindByEmail(email string) *User {
 	u := &User{}
-	mgm.Coll(u).First(bson.M{"email": email}, u) // get all of them?
+	if err := mgm.Coll(u).First(bson.M{"email": email}, u); err != nil { // get all of them?
+		return nil
+	}
 	return u
 }
