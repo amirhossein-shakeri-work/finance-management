@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth"
+	"github.com/sizata-siege/finance-management/controllers"
 )
 
 func SetupAPI(app *fiber.App) {
@@ -16,11 +16,11 @@ func SetupAPI(app *fiber.App) {
 
 	/* =-=-=-=-=-=-= Accounts =-=-=-=-=-=-= */
 	accounts := v1.Group("/accounts", auth.Middleware)
-	accounts.Get("/", account.IndexAccounts)
-	accounts.Post("/", account.StoreAccount)
-	accounts.Get("/:id", account.ShowAccount)
-	accounts.Patch("/:id", account.UpdateAccount)
-	accounts.Delete("/:id", account.DeleteAccount)
+	accounts.Get("/", controllers.IndexAccounts)
+	accounts.Post("/", controllers.StoreAccount)
+	accounts.Get("/:id", controllers.ShowAccount)
+	accounts.Patch("/:id", controllers.UpdateAccount)
+	accounts.Delete("/:id", controllers.DeleteAccount)
 
 	/* =-=-=-=-=-=-= Session & User =-=-=-=-=-=-= */
 	// v1.Get("/auth")    // get loged in user

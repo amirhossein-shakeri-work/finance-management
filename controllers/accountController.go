@@ -1,20 +1,22 @@
-package account
+package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/sizata-siege/finance-management/account"
+	"github.com/sizata-siege/finance-management/auth/jwt"
 )
 
 func IndexAccounts (c *fiber.Ctx) error {
-	var accounts []Account
-	err := mgm.Coll(&Account{}).SimpleFind(&accounts, bson.M{})
-	if err != nil { return err }
-	return c.JSON(accounts)
+	return c.JSON(jwt.New(c).User.Accounts)
+	// var accounts []account.Account
+	// err := mgm.Coll(&account.Account{}).SimpleFind(&accounts, bson.M{})
+	// if err != nil { return err }
+	// return c.JSON(accounts)
 }
 
 func ShowAccount (c *fiber.Ctx) error {
-	acc := &Account{}
+	acc := &account.Account{}
 	err := mgm.Coll(acc).FindByID(c.Params("id"), acc)
 	if err != nil { return err }
 	return c.JSON(acc)
@@ -22,7 +24,7 @@ func ShowAccount (c *fiber.Ctx) error {
 }
 
 func StoreAccount (c *fiber.Ctx) error {
-	acc := new(Account)
+	acc := new(account.Account)
 	err := c.BodyParser(acc)
 	if err != nil { return err }
 	err = mgm.Coll(acc).Create(acc)
@@ -36,7 +38,7 @@ func UpdateAccount (c *fiber.Ctx) error {
 
 func DeleteAccount (c *fiber.Ctx) error {
 	// fixme: returns 500 if nothing found, send 404 instead
-	acc := &Account{}
+	acc := &account.Account{}
 	err := mgm.Coll(acc).FindByID(c.Params("id"), acc)
 	if err != nil { return err }
 	err = mgm.Coll(acc).Delete(acc)

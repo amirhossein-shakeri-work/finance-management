@@ -28,6 +28,8 @@ func New(name, email, password string) *User {
 		Name:     name,
 		Email:    email,
 		Password: password,
+		Accounts: []account.Account{},
+		Tags: tag.Set{},
 	}
 }
 
