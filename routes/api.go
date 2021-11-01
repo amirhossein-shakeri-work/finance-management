@@ -17,7 +17,7 @@ func SetupAPI(app *fiber.App) {
 	/* =-=-=-=-=-=-= Accounts =-=-=-=-=-=-= */
 	accounts := v1.Group("/accounts", auth.Middleware)
 	accounts.Get("/", controllers.IndexAccounts)
-	accounts.Post("/", controllers.StoreAccount)
+	accounts.Post("/", controllers.CreateAccount)
 	accounts.Get("/:id", controllers.ShowAccount)
 	accounts.Patch("/:id", controllers.UpdateAccount)
 	accounts.Delete("/:id", controllers.DeleteAccount)

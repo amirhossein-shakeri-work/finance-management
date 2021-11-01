@@ -2,12 +2,17 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/kamva/mgm/v3"
-	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/jwt"
 )
 
-func IndexAccounts (c *fiber.Ctx) error {
+/* Requests */
+
+type CreateAccountRequest struct {
+	Name    string  `json:"name"`
+	Balance float64 `json:"balance"`
+}
+
+func IndexAccounts(c *fiber.Ctx) error {
 	return c.JSON(jwt.New(c).User.Accounts)
 	// var accounts []account.Account
 	// err := mgm.Coll(&account.Account{}).SimpleFind(&accounts, bson.M{})
@@ -15,35 +20,47 @@ func IndexAccounts (c *fiber.Ctx) error {
 	// return c.JSON(accounts)
 }
 
-func ShowAccount (c *fiber.Ctx) error {
-	acc := &account.Account{}
-	err := mgm.Coll(acc).FindByID(c.Params("id"), acc)
-	if err != nil { return err }
+func ShowAccount(c *fiber.Ctx) error {
+	/* Access User */
+	user := jwt.New(c).User
+
+	/* Retrieve Account */
+	acc := user.GetAccount(c.Params("id"))
+	if acc == nil {
+		return fiber.ErrNotFound
+	}
 	return c.JSON(acc)
-	// return fiber.ErrNotFound
 }
 
-func StoreAccount (c *fiber.Ctx) error {
-	acc := new(account.Account)
-	err := c.BodyParser(acc)
-	if err != nil { return err }
-	err = mgm.Coll(acc).Create(acc)
-	if err != nil { return err }
+func CreateAccount(c *fiber.Ctx) error {
+	req := CreateAccountRequest{} // name, balance
+	/* Parse Request Body */
+	if err := c.BodyParser(&req); err != nil {
+		return err
+	}
+
+	/* Access User */
+	user := jwt.New(c).User
+	acc, err := user.CreateAccount(req.Name, req.Balance)
+	if err != nil {
+		return err
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(acc)
 }
 
-func UpdateAccount (c *fiber.Ctx) error {
-	return c.SendString("Update Account")
+func UpdateAccount(c *fiber.Ctx) error {
+	return c.SendString("Update Account Coming Soon")
 }
 
-func DeleteAccount (c *fiber.Ctx) error {
-	// fixme: returns 500 if nothing found, send 404 instead
-	acc := &account.Account{}
-	err := mgm.Coll(acc).FindByID(c.Params("id"), acc)
-	if err != nil { return err }
-	err = mgm.Coll(acc).Delete(acc)
-	if err != nil { return err }
-	c.Status(fiber.StatusNoContent)
-	return nil
-	// return fiber.ErrNotFound
+func DeleteAccount(c *fiber.Ctx) error {
+	/* Access User */
+	user := jwt.New(c).User
+	if err := user.RemoveAccount(c.Params("id")); err != nil {
+		/* Not Found */
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.SendStatus(fiber.StatusNoContent)
 }

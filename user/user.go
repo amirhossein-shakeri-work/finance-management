@@ -1,6 +1,9 @@
 package user
 
 import (
+	"errors"
+	"time"
+
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/hash"
@@ -68,25 +71,29 @@ func (user *User) Creating() error {
 	}
 
 	for _, acc := range user.Accounts {
-		if err := acc.Creating(); err != nil {
-			return err
-		}
+		acc.CreatedAt = time.Now().UTC()
+		// if err := acc.Creating(); err != nil {
+		// 	return err
+		// }
 	}
 	return nil
 }
 
-func (user *User) Saving() error {
-	if err := user.DefaultModel.Saving(); err != nil {
-		return err
-	}
+// func (user *User) Saving() error {
+// 	if err := user.DefaultModel.Saving(); err != nil {
+// 		return err
+// 	}
 
-	for _, acc := range user.Accounts {
-		if err := acc.Saving(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+	// for _, acc := range user.Accounts {
+		// acc.UpdatedAt = time.Now().UTC() // shouldn't be like that cause every time
+		// user updated, all time stamps are updated too
+
+		// if err := acc.Saving(); err != nil {
+		// 	return err
+		// }
+	// }
+// 	return nil
+// }
 
 /* =-=-=-=-=-=-= DB Helpers =-=-=-=-=-=-= */
 
@@ -104,4 +111,64 @@ func FindByEmail(email string) *User {
 		return nil
 	}
 	return u
+}
+
+func (user *User) Save () error { // could return *User
+	if err := mgm.Coll(user).Update(user); err != nil {
+		return err
+	}
+	return nil
+}
+
+/* =-=-=-=-=-=-= Account =-=-=-=-=-=-= */
+
+func (user *User) AddAccount (acc *account.Account) error {
+	// Add the passed account
+	return nil
+}
+
+func (user *User) CreateAccount (name string, balance float64) (*account.Account, error) {
+	/* Create & Save account in user accounts */
+	acc := account.NewWithID(name, balance)
+	if err := acc.Creating(); err != nil {
+		return nil, err
+	}
+	if user.Accounts == nil {
+		user.Accounts = []account.Account{}
+	}
+	user.Accounts = append(user.Accounts, *acc)
+	if err := user.Save(); err != nil {
+		return nil, err
+	}
+	return acc, nil
+}
+
+func (user *User) RemoveAccount (id string) error {
+	/* find account */
+	for i, acc := range user.Accounts {
+		/* Compare ids */
+		if acc.ID.Hex() == id {
+			user.Accounts = append(user.Accounts[:i], user.Accounts[i + 1:]...)
+			return user.Save()
+		}
+	}
+	return errors.New("account not found " + id)
+}
+
+func (user *User) GetAccount (id string) *account.Account {
+	/* find account */
+	for _, acc := range user.Accounts {
+		if acc.ID.Hex() == id {
+			return &acc
+		}
+	}
+	/* Not Found */
+	return nil
+
+	/* by reference?! */
+	// for i, _ := range user.Accounts {
+	// 	if user.Accounts[i].ID.Hex() == id {
+	// 		return &user.Accounts[i]
+	// 	}
+	// }
 }

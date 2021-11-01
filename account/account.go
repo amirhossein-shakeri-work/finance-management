@@ -10,29 +10,23 @@ type Account struct {
 	mgm.DefaultModel `bson:",inline"`
 	Name             string             `json:"name" bson:"name"`
 	Balance          float64            `json:"balance" bson:"balance"`
-	UserID           primitive.ObjectID `json:"user_id" bson:"user_id"`
 	Tags             tag.Set            `json:"tags" bson:"tags"`
 } // default model adds _id, timestamps. inline flattens the struct
 
 type Attr struct {
 	name    string
 	balance float64
-	userId  primitive.ObjectID
 }
 
-func New(name string, balance float64, userId primitive.ObjectID) *Account {
+func New(name string, balance float64) *Account {
 	return &Account{
 		Name:    name,
 		Balance: balance,
-		UserID: userId,
 	}
 }
 
-func Create(a Attr) (*Account, error) {
-	acc := New(a.name, a.balance, a.userId)
-	return acc, mgm.Coll(acc).Create(acc)
-}
-
-func (acc *Account) Delete () (*Account, error) {
-	return acc, mgm.Coll(acc).Delete(acc)
+func NewWithID (name string, balance float64) *Account {
+	acc := New(name, balance)
+	acc.ID = primitive.NewObjectID()
+	return acc
 }
