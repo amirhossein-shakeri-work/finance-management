@@ -29,8 +29,9 @@ func SetupAPI(app *fiber.App) {
 	v1.Post("/users", auth.CreateNewUser)
 
 	/* =-=-=-=-=-=-= Transactions =-=-=-=-=-=-= */
-	// transactions := v1.Group("/transaction", auth.Middleware)
-	// transactions.Get("/", )
+	transactions := v1.Group("/transactions", auth.Middleware)
+	transactions.Get("/", controllers.IndexTransactions)
+	transactions.Post("/", controllers.CreateTransaction)
 
 	/* =-=-=-=-=-=-= Test =-=-=-=-=-=-= */
 	app.Get("/test", auth.Middleware, testHandler)
