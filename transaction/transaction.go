@@ -41,10 +41,6 @@ func Create(a Attr) (*Transaction, error) {
 	return tr, mgm.Coll(tr).Create(tr)
 }
 
-func (tr *Transaction) Delete() (*Transaction, error) {
-	return tr, mgm.Coll(tr).Delete(tr)
-}
-
 func Find(id string) *Transaction {
 	t := &Transaction{}
 	if err := mgm.Coll(t).FindByID(id, t); err != nil {
@@ -58,6 +54,10 @@ func (tr *Transaction) Save() error {
 		return err
 	}
 	return nil
+}
+
+func (tr *Transaction) Delete() (*Transaction, error) {
+	return tr, mgm.Coll(tr).Delete(tr)
 }
 
 func (tr *Transaction) Validate() (bool, error) {

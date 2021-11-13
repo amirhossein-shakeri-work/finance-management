@@ -38,6 +38,13 @@ func TmpMiddleware(c *fiber.Ctx) error {
 
 /* handlers & controllers */
 
+func Check(c *fiber.Ctx) error {
+	/* jwt is only available on authenticated routes using middleware! */
+	// j := jwt.New(c)
+	// fmt.Println(j.User)
+	return c.JSON(jwt.New(c).User)
+}
+
 func Login(c *fiber.Ctx) error {
 	usr := user.User{}
 	var req LoginRequest

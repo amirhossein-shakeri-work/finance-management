@@ -23,7 +23,7 @@ func SetupAPI(app *fiber.App) {
 	accounts.Delete("/:id", controllers.DeleteAccount)
 
 	/* =-=-=-=-=-=-= Session & User =-=-=-=-=-=-= */
-	// v1.Get("/auth")    // get loged in user
+	v1.Get("/auth", auth.Middleware, auth.Check)        // Check auth & get loged in user
 	v1.Post("/session", auth.Login)                     // login
 	v1.Delete("/session", auth.Middleware, auth.Logout) // logout / smiliar to /logout
 	v1.Post("/users", auth.CreateNewUser)

@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/jwt"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 /* Requests */
@@ -13,21 +16,21 @@ type CreateAccountRequest struct {
 }
 
 func IndexAccounts(c *fiber.Ctx) error {
-	return c.JSON(jwt.New(c).User.Accounts)
-	// var accounts []account.Account
-	// err := mgm.Coll(&account.Account{}).SimpleFind(&accounts, bson.M{})
-	// if err != nil { return err }
-	// return c.JSON(accounts)
+	user := jwt.New(c).User
+	var accounts []account.Account
+	err := mgm.Coll(&account.Account{}).SimpleFind(&accounts, bson.M{"user_id": user.ID})
+	if err != nil { return err }
+	return c.JSON(accounts)
+	// return c.JSON(jwt.New(c).User.Accounts)
 }
 
 func ShowAccount(c *fiber.Ctx) error {
-	/* Access User */
-	user := jwt.New(c).User
-
-	/* Retrieve Account */
-	acc := user.GetAccount(c.Params("id"))
-	if acc == nil {
-		return fiber.ErrNotFound
+	acc := &account.Account{}
+	if err := mgm.Coll(acc).FindByID(c.Params("id"), acc); err != nil {
+		return err
+	}
+	if jwt.New(c).User.ID != acc.ID {
+		return fiber.ErrForbidden // Those bitches only have access to their own accounts!
 	}
 	return c.JSON(acc)
 }
@@ -39,9 +42,9 @@ func CreateAccount(c *fiber.Ctx) error {
 		return err
 	}
 
-	/* Access User */
+	/* Access User & Create Account */
 	user := jwt.New(c).User
-	acc, err := user.CreateAccount(req.Name, req.Balance)
+	acc, err := account.Create(user.ID, req.Name, req.Balance)
 	if err != nil {
 		return err
 	}
@@ -56,7 +59,11 @@ func UpdateAccount(c *fiber.Ctx) error {
 func DeleteAccount(c *fiber.Ctx) error {
 	/* Access User */
 	user := jwt.New(c).User
-	if err := user.RemoveAccount(c.Params("id")); err != nil {
+	acc := account.Find(c.Params("id"))
+	if user.ID != acc.UserID {
+		return fiber.ErrForbidden // U can't delete others' accounts, bitch!
+	}
+	if err := acc.Delete(); err != nil {
 		/* Not Found */
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": err.Error(),

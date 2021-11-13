@@ -1,11 +1,7 @@
 package user
 
 import (
-	"errors"
-	"time"
-
 	"github.com/kamva/mgm/v3"
-	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/hash"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/tag"
@@ -16,7 +12,6 @@ type User struct {
 	Name             string            `json:"name" bson:"name"`
 	Email            string            `json:"email" bson:"email"`
 	Password         string            `json:"password" bson:"password"`
-	Accounts         []account.Account `json:"accounts" bson:"accounts"` // https://github.com/Kamva/mgm/discussions/39
 	Tags             tag.Set           `json:"tags" bson:"tags"`
 }
 
@@ -31,7 +26,6 @@ func New(name, email, password string) *User {
 		Name:     name,
 		Email:    email,
 		Password: password,
-		Accounts: []account.Account{},
 		Tags: tag.Set{},
 	}
 }
@@ -46,54 +40,9 @@ func Create(a Attr) (*User, error) { // is it ok to return pointer?
 	return usr, mgm.Coll(usr).Create(usr)
 }
 
-// func (user *User) Update(a map[string]interface{}) (*User, error) { // map[string]interface{}
-// 	// for key, value := range a {
-// 	// 	switch key {
-// 	// 	case "name": user.Name = string(value)
-// 	// 	}
-// 	// }
-// 	// mgm.Coll(user).Update()
-// 	return user, nil
-// }
-
 func (user *User) Delete() (*User, error) {
 	return user, mgm.Coll(user).Delete(user)
 }
-
-/* Override Hooks to add id & date times for nested documents */
-// https://github.com/Kamva/mgm/discussions/39
-
-func (user *User) Creating() error {
-	// now := time.Now().UTC()
-
-	if err := user.DefaultModel.Creating(); err != nil {
-		return err
-	}
-
-	for _, acc := range user.Accounts {
-		acc.CreatedAt = time.Now().UTC()
-		// if err := acc.Creating(); err != nil {
-		// 	return err
-		// }
-	}
-	return nil
-}
-
-// func (user *User) Saving() error {
-// 	if err := user.DefaultModel.Saving(); err != nil {
-// 		return err
-// 	}
-
-	// for _, acc := range user.Accounts {
-		// acc.UpdatedAt = time.Now().UTC() // shouldn't be like that cause every time
-		// user updated, all time stamps are updated too
-
-		// if err := acc.Saving(); err != nil {
-		// 	return err
-		// }
-	// }
-// 	return nil
-// }
 
 /* =-=-=-=-=-=-= DB Helpers =-=-=-=-=-=-= */
 
@@ -122,53 +71,53 @@ func (user *User) Save () error { // could return *User
 
 /* =-=-=-=-=-=-= Account =-=-=-=-=-=-= */
 
-func (user *User) AddAccount (acc *account.Account) error {
-	// Add the passed account
-	return nil
-}
+// func (user *User) AddAccount (acc *account.Account) error {
+// 	// Add the passed account
+// 	return nil
+// }
 
-func (user *User) CreateAccount (name string, balance float64) (*account.Account, error) {
-	/* Create & Save account in user accounts */
-	acc := account.NewWithID(name, balance)
-	if err := acc.Creating(); err != nil {
-		return nil, err
-	}
-	if user.Accounts == nil {
-		user.Accounts = []account.Account{}
-	}
-	user.Accounts = append(user.Accounts, *acc)
-	if err := user.Save(); err != nil {
-		return nil, err
-	}
-	return acc, nil
-}
+// func (user *User) CreateAccount (name string, balance float64) (*account.Account, error) {
+// 	/* Create & Save account in user accounts */
+// 	acc := account.NewWithID(name, balance)
+// 	if err := acc.Creating(); err != nil {
+// 		return nil, err
+// 	}
+// 	if user.Accounts == nil {
+// 		user.Accounts = []account.Account{}
+// 	}
+// 	user.Accounts = append(user.Accounts, *acc)
+// 	if err := user.Save(); err != nil {
+// 		return nil, err
+// 	}
+// 	return acc, nil
+// }
 
-func (user *User) RemoveAccount (id string) error {
-	/* find account */
-	for i, acc := range user.Accounts {
-		/* Compare ids */
-		if acc.ID.Hex() == id {
-			user.Accounts = append(user.Accounts[:i], user.Accounts[i + 1:]...)
-			return user.Save()
-		}
-	}
-	return errors.New("account not found " + id)
-}
+// func (user *User) RemoveAccount (id string) error {
+// 	/* find account */
+// 	for i, acc := range user.Accounts {
+// 		/* Compare ids */
+// 		if acc.ID.Hex() == id {
+// 			user.Accounts = append(user.Accounts[:i], user.Accounts[i + 1:]...)
+// 			return user.Save()
+// 		}
+// 	}
+// 	return errors.New("account not found " + id)
+// }
 
-func (user *User) GetAccount (id string) *account.Account {
-	/* find account */
-	for _, acc := range user.Accounts {
-		if acc.ID.Hex() == id {
-			return &acc
-		}
-	}
-	/* Not Found */
-	return nil
-
-	/* by reference?! */
-	// for i, _ := range user.Accounts {
-	// 	if user.Accounts[i].ID.Hex() == id {
-	// 		return &user.Accounts[i]
-	// 	}
-	// }
-}
+// func (user *User) GetAccount (id string) *account.Account {
+// 	/* find account */
+// 	for _, acc := range user.Accounts {
+// 		if acc.ID.Hex() == id {
+// 			return &acc
+// 		}
+// 	}
+// 	/* Not Found */
+// 	return nil
+//
+// 	/* by reference?! */
+// 	// for i, _ := range user.Accounts {
+// 	// 	if user.Accounts[i].ID.Hex() == id {
+// 	// 		return &user.Accounts[i]
+// 	// 	}
+// 	// }
+// }
