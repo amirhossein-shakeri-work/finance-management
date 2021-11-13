@@ -55,6 +55,11 @@ func (acc *Account) Delete() error {
 	return mgm.Coll(acc).Delete(acc)
 }
 
+func (acc *Account) CanHaveNegativeBalance() bool {
+	/* Check tags maybe? */
+	return false
+}
+
 // func (acc *Account) Validate() (bool, error) {
 // 	/* Check if UserId is valid & existing */
 // }

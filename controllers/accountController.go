@@ -27,9 +27,9 @@ func IndexAccounts(c *fiber.Ctx) error {
 func ShowAccount(c *fiber.Ctx) error {
 	acc := &account.Account{}
 	if err := mgm.Coll(acc).FindByID(c.Params("id"), acc); err != nil {
-		return err
+		return fiber.ErrNotFound
 	}
-	if jwt.New(c).User.ID != acc.ID {
+	if jwt.New(c).User.ID != acc.UserID {
 		return fiber.ErrForbidden // Those bitches only have access to their own accounts!
 	}
 	return c.JSON(acc)

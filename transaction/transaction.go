@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/account"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/tag"
 )
@@ -72,4 +73,24 @@ func (tr *Transaction) Validate() (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (tr *Transaction) HasValidSource () bool {
+	/* check if account is not soft deleted, suspended, blocked or something */
+	return primitive.IsValidObjectID(tr.Source)
+}
+
+func (tr *Transaction) HasValidDestination () bool {
+	/* check if account is not soft deleted, suspended, blocked or something */
+	return primitive.IsValidObjectID(tr.Destination)
+}
+
+/* =-=-=-=-=-=-=-=-=-=-= Relations =-=-=-=-=-=-=-=-=-=-= */
+
+func (tr *Transaction) SourceAcc() *account.Account {
+	return account.Find(tr.Source)
+}
+
+func (tr *Transaction) DestinationAcc() *account.Account {
+	return account.Find(tr.Destination)
 }

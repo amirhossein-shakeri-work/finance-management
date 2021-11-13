@@ -36,20 +36,46 @@ func CreateTransaction(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"message": err.Error()})
 	}
 
-	// isValid, err := tr.Validate()
-	// fmt.Printf("%+v\n%+v\n%+v\n%+v\n", tr, isValid, err, req)
-
 	/* Create Transaction */
 	if err := mgm.Coll(tr).Create(tr); err != nil {
 		return err
 	}
 
 	/* Decrease source & Increase Destination by amount */
-	// how to find the account with given id in src or dest?
-	// we can find the user contains the acc with target accID
-	// and then do the job
-	// , or
-	// we can get accounts in a separate collection! what to do now???
+	// we could use db transactions to undo the changes in accounts if somewhere not ok
+	affectsSrc := false
+	affectsDest := false
+	if tr.HasValidSource() {
+		/* Check if account balance is not negative */
+		src := tr.SourceAcc()
+		sub := src.Balance - tr.Amount
+		if sub < 0 {
+			/* Check if source account can have negative values */
+			if !src.CanHaveNegativeBalance() {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "insufficient funds"})
+			}
+		}
+		/* Apply source transaction effect */
+		affectsSrc = true
+	}
+
+	if tr.HasValidDestination() {
+		/* Apply source transaction effect */
+		affectsDest = true
+	}
+	// todo: I should find a better algorithm for this!
 
 	return nil
+}
+
+func UpdateTransaction(c *fiber.Ctx) error {
+	return fiber.ErrNotImplemented
+}
+
+func DeleteTransaction(c *fiber.Ctx) error {
+	return fiber.ErrNotImplemented
+}
+
+func UndoTransaction(c *fiber.Ctx) error {
+	return fiber.ErrNotImplemented
 }

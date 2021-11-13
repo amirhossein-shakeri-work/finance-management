@@ -32,6 +32,9 @@ func SetupAPI(app *fiber.App) {
 	transactions := v1.Group("/transactions", auth.Middleware)
 	transactions.Get("/", controllers.IndexTransactions)
 	transactions.Post("/", controllers.CreateTransaction)
+	transactions.Patch("/:id", controllers.UpdateTransaction) // description only?
+	transactions.Delete("/:id", controllers.DeleteTransaction)
+	transactions.Post("/:id/undo", controllers.UndoTransaction)
 
 	/* =-=-=-=-=-=-= Test =-=-=-=-=-=-= */
 	app.Get("/test", auth.Middleware, testHandler)
