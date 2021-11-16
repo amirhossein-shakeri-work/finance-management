@@ -60,6 +60,15 @@ func (acc *Account) CanHaveNegativeBalance() bool {
 	return false
 }
 
+func (acc *Account) IncreaseBalance(n float64) error {
+	acc.Balance += n
+	return acc.Save()
+}
+
+func (acc *Account) DecreaseBalance(n float64) error {
+	return acc.IncreaseBalance(-n)
+}
+
 // func (acc *Account) Validate() (bool, error) {
 // 	/* Check if UserId is valid & existing */
 // }

@@ -85,6 +85,44 @@ func (tr *Transaction) HasValidDestination () bool {
 	return primitive.IsValidObjectID(tr.Destination)
 }
 
+func (tr *Transaction) Apply () error {
+	/* Check for valid source & destination & apply transaction */
+	if tr.HasValidSource() {
+		if err := tr.ApplyOnSource(); err != nil {
+			return err
+		}
+	}
+	if tr.HasValidDestination() {
+		if err := tr.ApplyOnDestination(); err != nil {
+			return err
+		}
+	}
+	return nil
+	// return errors.New("no valid source & destination")
+}
+
+func (tr *Transaction) ApplyOnSource () error {
+	if !tr.HasValidSource() {
+		return errors.New("invalid source")
+	}
+	/* Apply transaction on source */
+	if acc := tr.SourceAcc(); acc != nil {
+		return acc.DecreaseBalance(tr.Amount)
+	}
+	return errors.New("couldn't apply transaction on source")
+}
+
+func (tr *Transaction) ApplyOnDestination () error {
+	if !tr.HasValidDestination() {
+		return errors.New("invalid destination")
+	}
+	/* Apply transaction on destination */
+	if acc := tr.DestinationAcc(); acc != nil {
+		return acc.IncreaseBalance(tr.Amount)
+	}
+	return errors.New("couldn't apply transaction on destination")
+}
+
 /* =-=-=-=-=-=-=-=-=-=-= Relations =-=-=-=-=-=-=-=-=-=-= */
 
 func (tr *Transaction) SourceAcc() *account.Account {

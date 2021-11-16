@@ -43,8 +43,8 @@ func CreateTransaction(c *fiber.Ctx) error {
 
 	/* Decrease source & Increase Destination by amount */
 	// we could use db transactions to undo the changes in accounts if somewhere not ok
-	affectsSrc := false
-	affectsDest := false
+	// affectsSrc := false
+	// affectsDest := false
 	if tr.HasValidSource() {
 		/* Check if account balance is not negative */
 		src := tr.SourceAcc()
@@ -56,16 +56,21 @@ func CreateTransaction(c *fiber.Ctx) error {
 			}
 		}
 		/* Apply source transaction effect */
-		affectsSrc = true
+		// affectsSrc = true
 	}
 
 	if tr.HasValidDestination() {
+		/* Check for any errors to throw */
 		/* Apply source transaction effect */
-		affectsDest = true
+		// affectsDest = true
 	}
-	// todo: I should find a better algorithm for this!
 
-	return nil
+	/* All errors are now checked & here nothing is wrong no need for transactions :) */
+	if err := tr.Apply(); err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(tr)
 }
 
 func UpdateTransaction(c *fiber.Ctx) error {
