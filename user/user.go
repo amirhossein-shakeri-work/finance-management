@@ -1,7 +1,10 @@
 package user
 
 import (
+	"log"
+
 	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/hash"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/tag"
@@ -69,7 +72,16 @@ func (user *User) Save () error { // could return *User
 	return nil
 }
 
-/* =-=-=-=-=-=-= Account =-=-=-=-=-=-= */
+/* =-=-=-=-=-=-= Relations =-=-=-=-=-=-= */
+
+func (user *User) Accounts () []*account.Account {
+	var accounts []*account.Account
+	if err := mgm.Coll(&account.Account{}).SimpleFind(accounts, bson.M{"user_id": user.ID}); err != nil {
+		log.Println(err)
+		return nil
+	}
+	return accounts
+}
 
 // func (user *User) AddAccount (acc *account.Account) error {
 // 	// Add the passed account
