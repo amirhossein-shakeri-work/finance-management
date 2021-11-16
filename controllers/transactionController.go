@@ -3,10 +3,18 @@ package controllers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/auth/jwt"
 	"github.com/sizata-siege/finance-management/transaction"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 /* Requests */
+
+type IndexTransactionsRequest struct {
+	AccID       primitive.ObjectID `json:"acc_id"`
+	Source      string             `json:"source"`
+	Destination string             `json:"destination"`
+}
 
 type CreateTransactionRequest struct {
 	Source      string  `json:"source"` // primitive.ObjectID
@@ -17,7 +25,11 @@ type CreateTransactionRequest struct {
 
 func IndexTransactions(c *fiber.Ctx) error {
 	/* Get User */
+	user := jwt.New(c)
+
 	/* Get Trans based on filters passed (src, dest, amount, id, all_of_user) */
+	/* Or get all transactions of all user accounts using cool db aggregations! */
+	/* if accId null in request body, then look for params /:accID/transactions */
 	return nil
 }
 
