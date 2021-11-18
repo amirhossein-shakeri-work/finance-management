@@ -14,6 +14,12 @@ type Account struct {
 	Tags             tag.Set            `json:"tags" bson:"tags"`
 } // default model adds _id, timestamps. inline flattens the struct
 
+// type Person struct {
+// 	Name   string  `json:"name" bson:"name"`
+// 	Age    int     `json:"age" bson:"age"`
+// 	Weight float64 `json:"weight" bson:"weight"`
+// }
+
 type Attr struct {
 	name    string
 	balance float64
@@ -40,7 +46,7 @@ func Find(id string) *Account {
 	return acc
 }
 
-func Delete (id string) error {
+func Delete(id string) error {
 	return Find(id).Delete()
 }
 

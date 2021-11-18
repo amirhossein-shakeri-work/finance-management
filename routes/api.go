@@ -21,6 +21,7 @@ func SetupAPI(app *fiber.App) {
 	accounts.Get("/:id", controllers.ShowAccount)
 	accounts.Patch("/:id", controllers.UpdateAccount)
 	accounts.Delete("/:id", controllers.DeleteAccount)
+	accounts.Get("/:id/transactions", controllers.IndexTransactions)
 
 	/* =-=-=-=-=-=-= Session & User =-=-=-=-=-=-= */
 	v1.Get("/auth", auth.Middleware, auth.Check)        // Check auth & get loged in user

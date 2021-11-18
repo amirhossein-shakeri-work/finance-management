@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamva/mgm/v3"
+	"github.com/sizata-siege/finance-management/account"
 	"github.com/sizata-siege/finance-management/auth/jwt"
 	"github.com/sizata-siege/finance-management/transaction"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -25,8 +26,22 @@ type CreateTransactionRequest struct {
 
 func IndexTransactions(c *fiber.Ctx) error {
 	/* Get User */
-	user := jwt.New(c)
+	user := jwt.New(c).User
 
+	if accId := c.Params("id"); accId != "" {
+		acc := account.Find(accId)
+		if acc == nil {
+			return fiber.ErrNotFound
+		}
+		if acc.UserID != user.ID {
+			return fiber.ErrForbidden // they can't fetch others' accounts!
+		}
+
+		/* find all transactions related to the account (source, destination) */
+		// https://github.com/Kamva/mgm/discussions/54
+		// https://docs.mongodb.com/drivers/go/current/fundamentals/crud/read-operations/retrieve/
+		// https://docs.mongodb.com/drivers/go/current/fundamentals/bson/#std-label-bson-unmarshalling
+	}
 	/* Get Trans based on filters passed (src, dest, amount, id, all_of_user) */
 	/* Or get all transactions of all user accounts using cool db aggregations! */
 	/* if accId null in request body, then look for params /:accID/transactions */
