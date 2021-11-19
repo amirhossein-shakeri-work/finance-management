@@ -75,6 +75,24 @@ func (acc *Account) DecreaseBalance(n float64) error {
 	return acc.IncreaseBalance(-n)
 }
 
+/* =-=-=-=-=-=-=-=-=-=-= Relations =-=-=-=-=-=-=-=-=-=-= */
+
+// Transactions /* Causes import cycle */
+// func (acc *Account) Transactions() ([]*transaction.Transaction, error) {
+// 	/* Result would be the transactions with accID as source or destination */
+// 	transactions := make([]*transaction.Transaction, 0)
+// 	if err := mgm.Coll(&transaction.Transaction{}).SimpleFind(&transactions, bson.M{"$or": bson.A{
+// 		bson.M{"source": acc.ID},
+// 		bson.M{"destination": acc.ID},
+// 	}}); err != nil {
+// 		return nil, err
+// 	}
+// 	return transactions, nil
+// 	// https://github.com/Kamva/mgm/discussions/54
+// 	// https://docs.mongodb.com/drivers/go/current/fundamentals/crud/read-operations/retrieve/
+// 	// https://docs.mongodb.com/drivers/go/current/fundamentals/bson/#std-label-bson-unmarshalling
+// }
+
 // func (acc *Account) Validate() (bool, error) {
 // 	/* Check if UserId is valid & existing */
 // }

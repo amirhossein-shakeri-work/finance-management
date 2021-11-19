@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/account"
@@ -28,7 +30,9 @@ func IndexTransactions(c *fiber.Ctx) error {
 	/* Get User */
 	user := jwt.New(c).User
 
+	/* if accId is passed in params like this /:accID/transactions */
 	if accId := c.Params("id"); accId != "" {
+		fmt.Println("accID passed in params: ", accId)
 		acc := account.Find(accId)
 		if acc == nil {
 			return fiber.ErrNotFound
@@ -38,13 +42,24 @@ func IndexTransactions(c *fiber.Ctx) error {
 		}
 
 		/* find all transactions related to the account (source, destination) */
-		// https://github.com/Kamva/mgm/discussions/54
-		// https://docs.mongodb.com/drivers/go/current/fundamentals/crud/read-operations/retrieve/
-		// https://docs.mongodb.com/drivers/go/current/fundamentals/bson/#std-label-bson-unmarshalling
+		if trs, err := transaction.RelatedToAccount(acc); err != nil {
+			return err
+		} else {
+			fmt.Println("Done with result: ", trs)
+			return c.JSON(trs)
+		}
 	}
+
+	/* If no accId is passed in params, parse request body */
+	req := &IndexTransactionsRequest{}
+	if err := c.BodyParser(req); err != nil {
+		return err
+	}
+
 	/* Get Trans based on filters passed (src, dest, amount, id, all_of_user) */
 	/* Or get all transactions of all user accounts using cool db aggregations! */
-	/* if accId null in request body, then look for params /:accID/transactions */
+	/* they can also filter using balance e.g. balance: {operator: '>=', value: 102} or {57: '<', 110.4: '>='} */
+	/* also filter by date */
 	return nil
 }
 

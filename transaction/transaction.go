@@ -5,6 +5,7 @@ import (
 
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/account"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/tag"
 )
@@ -75,17 +76,17 @@ func (tr *Transaction) Validate() (bool, error) {
 	return true, nil
 }
 
-func (tr *Transaction) HasValidSource () bool {
+func (tr *Transaction) HasValidSource() bool {
 	/* check if account is not soft deleted, suspended, blocked or something */
 	return primitive.IsValidObjectID(tr.Source)
 }
 
-func (tr *Transaction) HasValidDestination () bool {
+func (tr *Transaction) HasValidDestination() bool {
 	/* check if account is not soft deleted, suspended, blocked or something */
 	return primitive.IsValidObjectID(tr.Destination)
 }
 
-func (tr *Transaction) Apply () error {
+func (tr *Transaction) Apply() error {
 	/* Check for valid source & destination & apply transaction */
 	if tr.HasValidSource() {
 		if err := tr.ApplyOnSource(); err != nil {
@@ -101,7 +102,7 @@ func (tr *Transaction) Apply () error {
 	// return errors.New("no valid source & destination")
 }
 
-func (tr *Transaction) ApplyOnSource () error {
+func (tr *Transaction) ApplyOnSource() error {
 	if !tr.HasValidSource() {
 		return errors.New("invalid source")
 	}
@@ -112,7 +113,7 @@ func (tr *Transaction) ApplyOnSource () error {
 	return errors.New("couldn't apply transaction on source")
 }
 
-func (tr *Transaction) ApplyOnDestination () error {
+func (tr *Transaction) ApplyOnDestination() error {
 	if !tr.HasValidDestination() {
 		return errors.New("invalid destination")
 	}
@@ -131,4 +132,21 @@ func (tr *Transaction) SourceAcc() *account.Account {
 
 func (tr *Transaction) DestinationAcc() *account.Account {
 	return account.Find(tr.Destination)
+}
+
+func RelatedToAccount(acc *account.Account) ([]*Transaction, error) {
+	/* Result would be the transactions with accID as source or destination */
+	transactions := make([]*Transaction, 0)
+	if err := mgm.Coll(&Transaction{}).SimpleFind(&transactions, bson.M{"$or": bson.A{
+		bson.M{"source": bson.M{"$eq": acc.ID.Hex()}},
+		bson.M{"destination": bson.M{"$eq": acc.ID.Hex()}},
+		// bson.M{"amount": 50},
+		// bson.M{"amount": bson.M{"$lt": 5}},
+	}}); err != nil {
+		return nil, err
+	}
+	return transactions, nil
+	// https://github.com/Kamva/mgm/discussions/54
+	// https://docs.mongodb.com/drivers/go/current/fundamentals/crud/read-operations/retrieve/
+	// https://docs.mongodb.com/drivers/go/current/fundamentals/bson/#std-label-bson-unmarshalling
 }
