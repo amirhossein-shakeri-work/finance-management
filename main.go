@@ -7,17 +7,24 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/joho/godotenv"
 	"github.com/kamva/mgm/v3"
 	"github.com/sizata-siege/finance-management/routes"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func init() {
-	// https://github.com/Kamva/mgm
-	err := mgm.SetDefaultConfig(nil, "finance",
-		options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal(err)
+	/* Load .env */
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file: ", err)
+	}
+	/* Connect to DB using kamva/mgm (https://github.com/Kamva/mgm) */
+	if err := mgm.SetDefaultConfig(
+		nil,
+		"finance",
+		options.Client().ApplyURI("mongodb://localhost:27017"),
+	); err != nil {
+		log.Fatal("Error connecting to db: ", err)
 	}
 	log.Println("Connected to db ✔️")
 }
